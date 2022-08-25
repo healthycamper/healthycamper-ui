@@ -20,14 +20,4 @@ const screens = {
 
 const Stack = createStackNavigator(screens);
 export default createAppContainer(Stack)
-// export default function homeStack() {
-//     return (
-//         <NavigationContainer>
-//           <Stack.Navigator>
-//           <Stack.Screen name="Home" component={Home} />
-//           <Stack.Screen name="Review Details" component={ReviewDetails} />
-//           </Stack.Navigator>
-//         </NavigationContainer>
-//     );
-//   }
 

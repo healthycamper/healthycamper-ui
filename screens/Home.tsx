@@ -1,4 +1,7 @@
 import { Text, View, StyleSheet, Button, ImageBackground } from 'react-native';
+import { LogBox } from 'react-native';
+
+//LogBox.ignoreLogs(['Sending...']);
 const img = {uri: "https:www.creativefabrica.com/wp-content/uploads/2021/07/15/Wellness-and-Health-Logo-Graphics-14753823-1.jpg"}
 
 const Home = ({navigation}: {navigation: any}) => {
@@ -22,8 +25,8 @@ const Home = ({navigation}: {navigation: any}) => {
         <Text style={styles.text}>Please login or signup</Text>
       </View>
       <View style={styles.footer}>
-        <Button title="Login" onPress={pressHandlerLogin}/>
-        <Button title="Signup" onPress={pressHandlerSignup}/>
+        <Button title="Login" onPress={()=>pressHandlerLogin()}/>
+        <Button title="Signup" onPress={()=>pressHandlerSignup()}/>
       </View>
     </View>
   );

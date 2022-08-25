@@ -1,14 +1,44 @@
 import React from "react";
-import { SafeAreaView, StyleSheet, TextInput, Text, Pressable, Image } from "react-native";
+import { SafeAreaView, StyleSheet, TextInput, Text, Pressable, Image, Keyboard } from "react-native";
+import Cookies from 'universal-cookie';
 
 const Login = () => {
   const [email, onChangeEmail] = React.useState("");
   const [password, onChangePassword] = React.useState("");
+  const [loggedIn, setLoggedIn] = React.useState(false);
+
+  const login = () => {
+    const cookies = new Cookies()
+      const requestOptions = {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({password: password, email: email}),
+    };
+    fetch("url", requestOptions)
+    .then((response) => {
+      return response.json();
+    })
+    .then((data) => {
+      setLoggedIn(true)
+      cookies.set('councelorEmail', data.email);
+      if(loggedIn){
+        //take to homepage
+      }else{
+        //display error
+      }
+    })
+    .catch((err) => {
+      console.log(err)
+    })
+  }
 
   return (
     <SafeAreaView style={styles.safeAreaView}>
       <Image
-        style={{width: 200, height: 200, marginBottom: 50}}
+        style={{width: 150, height: 150, marginTop: -100, marginBottom: 50}}
         source={{uri: 'https:www.creativefabrica.com/wp-content/uploads/2021/07/15/Wellness-and-Health-Logo-Graphics-14753823-1.jpg'}}
         resizeMode={'cover'}
       />
@@ -17,6 +47,7 @@ const Login = () => {
         style={styles.input}
         onChangeText={onChangeEmail}
         value={email}
+        onBlur={Keyboard.dismiss}
       />
       <TextInput
         placeholder="password"
@@ -24,8 +55,9 @@ const Login = () => {
         style={styles.input}
         onChangeText={onChangePassword}
         value={password}
+        onBlur={Keyboard.dismiss}
       />
-      <Pressable style={styles.button}>
+      <Pressable style={styles.button} onPress={()=>login()}>
         <Text style={styles.buttonText}>Login</Text>
       </Pressable>
     </SafeAreaView>
