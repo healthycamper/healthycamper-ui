@@ -1,11 +1,23 @@
-import React from "react";
+import React, { useState } from 'react';
 import { SafeAreaView, StyleSheet, TextInput, Text, Pressable, Image, Keyboard } from "react-native";
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
+import Councelor from './Councelor';
 import Cookies from 'universal-cookie';
 
+const Stack = createStackNavigator();
+
+
+export interface GlobalType {
+  email: string;
+  password: string;
+  loggedIn: boolean;
+}
+
 const Login = () => {
-  const [email, onChangeEmail] = React.useState("");
-  const [password, onChangePassword] = React.useState("");
-  const [loggedIn, setLoggedIn] = React.useState(false);
+  const [email, onChangeEmail] = useState<GlobalType['email']>("");
+  const [password, onChangePassword] = useState<GlobalType['password']>("");
+  const [loggedIn, setLoggedIn] = useState<GlobalType['loggedIn']>(false);
 
   const login = () => {
     const cookies = new Cookies()
@@ -17,18 +29,14 @@ const Login = () => {
     },
     body: JSON.stringify({password: password, email: email}),
     };
-    fetch("url", requestOptions)
+    fetch("http://localhost:3000/signin", requestOptions)
     .then((response) => {
       return response.json();
     })
     .then((data) => {
+      // console.log('this is data', data)
       setLoggedIn(true)
-      cookies.set('councelorEmail', data.email);
-      if(loggedIn){
-        //take to homepage
-      }else{
-        //display error
-      }
+      // cookies.set('councelorEmail', data.email);
     })
     .catch((err) => {
       console.log(err)
@@ -36,6 +44,15 @@ const Login = () => {
   }
 
   return (
+    loggedIn ? (
+      <SafeAreaView style={styles.safeAreaView}>
+      <NavigationContainer>
+        <Stack.Navigator>
+          <Stack.Screen name="Councelor" component={Councelor} />
+        </Stack.Navigator>
+      </NavigationContainer>
+      </SafeAreaView>
+    ) : (
     <SafeAreaView style={styles.safeAreaView}>
       <Image
         style={{width: 150, height: 150, marginTop: -100, marginBottom: 50}}
@@ -60,7 +77,8 @@ const Login = () => {
       <Pressable style={styles.button} onPress={()=>login()}>
         <Text style={styles.buttonText}>Login</Text>
       </Pressable>
-    </SafeAreaView>
+        </SafeAreaView>
+    )
   );
 };
 

@@ -1,5 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import Navigator from './routes/homeStack';
+// import { createStackNavigator } from '@react-navigation/stack';
 // import { Text, View, StyleSheet } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 // import { NavigationContainer } from '@react-navigation/native';
