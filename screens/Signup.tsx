@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { SafeAreaView, StyleSheet, TextInput, Text, Pressable, Image, Keyboard } from "react-native";
 import Cookies from 'universal-cookie';
 import { createStackNavigator } from '@react-navigation/stack';
 import { NavigationContainer } from '@react-navigation/native';
-import Councelor from './Councelor';
+import homeStack from '../routes/homeStack';
+import authContext from '../components/authContext';
 
 const Stack = createStackNavigator();
 
@@ -22,7 +23,8 @@ const Signup = () => {
   const [password, onChangePassword] = useState<GlobalType['password']>("");
   const [name, onChangeName] = useState<GlobalType['name']>("");
   const [number, onChangeNumber] = useState<GlobalType['number']>();
-  const [signedUp, setSignedUp] = useState<GlobalType['signedUp']>(false);
+//   const [signedUp, setSignedUp] = useState<GlobalType['signedUp']>(false);
+  const { authenticated, setAuthenticated } = useContext(authContext);
 
   const signup = () => {
     const cookies = new Cookies()
@@ -43,13 +45,8 @@ const Signup = () => {
         })
         .then((data) => {
             console.log('this is data', data)
-            setSignedUp(true)
+            setAuthenticated(true)
             cookies.set('councelorEmail', data.email);
-            if(signedUp){
-              //take to homepage
-            }else{
-              //display error
-            }
         })
         .catch((err) => {
             console.log(err)
@@ -57,15 +54,6 @@ const Signup = () => {
   }
 
   return (
-        signedUp ? (
-        <SafeAreaView style={styles.safeAreaView}>
-        <NavigationContainer>
-          <Stack.Navigator>
-            <Stack.Screen name="Councelor" component={Councelor} />
-          </Stack.Navigator>
-        </NavigationContainer>
-        </SafeAreaView>
-      ) : (
       <SafeAreaView style={styles.safeAreaView}>
       <Image
         style={{width: 150, height: 150, marginTop: -50, marginBottom: 30}}
@@ -106,7 +94,6 @@ const Signup = () => {
       </Pressable>
         </SafeAreaView>
     )
-  );
 };
 
 const styles = StyleSheet.create({
