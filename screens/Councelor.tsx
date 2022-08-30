@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Text, View, StyleSheet } from 'react-native';
+import { Text, View, StyleSheet, TextInput } from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
 
 export interface GlobalType {
@@ -18,7 +18,7 @@ export default function Councelor() {
   return (
     <>
     <View>
-      <Text style={styles.label} >Choose a camper</Text>
+      <Text style={styles.label}>Choose a camper</Text>
     </View>
     <DropDownPicker
       // style={styles.dropdown}
@@ -28,7 +28,19 @@ export default function Councelor() {
       setOpen={setOpen}
       setValue={setValue}
       setItems={setItems}
-    />
+      />
+    
+      <View>
+        <Text style={styles.label}>Add a new camper</Text>
+        <TextInput
+          style={styles.textBox}
+          placeholder="name"
+          //onChangeText={onChangeText}
+          //value={value}
+        />
+      </View>
+
+
     </>
   );
   }
@@ -37,8 +49,16 @@ export default function Councelor() {
     label: {
       marginTop: 50,
       marginBottom: 10,
+      marginLeft: 10,
       fontSize: 18,
       fontWeight: 'bold'
+    },
+    textBox: {
+      height: 40,
+      margin: 5,
+      borderWidth: 1, 
+      padding: 10,
+      borderRadius: 10
     }
   })
   
