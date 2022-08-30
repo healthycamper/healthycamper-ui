@@ -1,17 +1,29 @@
 import React, { useState } from 'react';
-import { SafeAreaView, Text, View, StyleSheet, Pressable, TextInput, Keyboard } from 'react-native';
+import { Alert, Modal, SafeAreaView, Text, View, StyleSheet, Pressable, TextInput, Keyboard } from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
 
 export interface GlobalType {
   nickname: string;
-  email: string;
-  password: string;
+  age: string;
+  diagnosis: string;
+  medication: string;
+  dosage: string;
+  gender: string;
+  parent: string;
+  doctor: string;
 }
 
 export default function Councelor() {
+  const [modalVisible, setModalVisible] = useState(false);
+  
   const [nickName, onChangeNickName] = useState<GlobalType['nickname']>("");
-  const [email, onChangeEmail] = useState<GlobalType['email']>("");
-  const [password, onChangePassword] = useState<GlobalType['password']>("");
+  const [age, onChangeAge] = useState<GlobalType['age']>("");
+  const [diagnosis, onChangeDiagnosis] = useState<GlobalType['diagnosis']>("");
+  const [medication, onChangeMedication] = useState<GlobalType['medication']>("");
+  const [dosage, onChangeDosage] = useState<GlobalType['dosage']>("");
+  const [gender, onChangeGender] = useState<GlobalType['gender']>("");
+  const [parent, onChangeParent] = useState<GlobalType['parent']>("");
+  const [doctor, onChangeDoctor] = useState<GlobalType['doctor']>("");
 
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState(null);
@@ -22,9 +34,14 @@ export default function Councelor() {
 
   return (
     <SafeAreaView style={styles.safeAreaView}>
-    <View>
-      <Text style={styles.label} >Choose a camper</Text>
-    </View>
+    <View style={styles.insideWrapper}>
+    {/* <View>
+        <Text style={styles.label}>Choose a camper</Text>
+    </View> */}
+      <Pressable>
+        <Text style={styles.addCamperButton}>+</Text>
+      </Pressable> 
+    
     <DropDownPicker
       style={styles.dropdown}
       open={open}
@@ -43,42 +60,125 @@ export default function Councelor() {
         fontWeight: "bold"
       }}
     />
+  </View>
     <View>
       <Text style={styles.labelTwo} >or create a new one</Text>
     </View>
-    <TextInput
-        placeholder="Nick name"
-        style={styles.input}
-        onChangeText={onChangeNickName}
-        value={nickName}
-        onBlur={Keyboard.dismiss}
-    />
-     <TextInput
-        placeholder="Email"
-        style={styles.input}
-        onChangeText={onChangeEmail}
-        value={email}
-        onBlur={Keyboard.dismiss}
-    />
-    <TextInput
-        placeholder="Password"
-        secureTextEntry={true} 
-        style={styles.input}
-        onChangeText={onChangePassword}
-        value={password}
-        onBlur={Keyboard.dismiss}
-    />
-    <Pressable style={styles.createButton}>
+    <Pressable style={styles.createButton}
+      onPress={() => setModalVisible(true)}
+    >
       <Text style={styles.createButtonText}>Create</Text>
     </Pressable>
     <Pressable style={styles.button}>
       <Text style={styles.buttonText}>Logout</Text>
     </Pressable>
+    <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => {
+          Alert.alert("Modal has been closed.");
+          setModalVisible(!modalVisible);
+        }}
+      >
+        <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+          <TextInput
+        placeholder="Nickname"
+        style={styles.input}
+        onChangeText={onChangeNickName}
+        value={nickName}
+        onBlur={Keyboard.dismiss}
+        />
+        <TextInput
+            placeholder="Age"
+            style={styles.input}
+            onChangeText={onChangeAge}
+            value={age}
+            onBlur={Keyboard.dismiss}
+        />
+        <TextInput
+            placeholder="Diagnosis"
+            style={styles.input}
+            onChangeText={onChangeDiagnosis}
+            value={diagnosis}
+            onBlur={Keyboard.dismiss}
+        />
+        <TextInput
+            placeholder="Medication"
+            style={styles.input}
+            onChangeText={onChangeMedication}
+            value={medication}
+            onBlur={Keyboard.dismiss}
+        />
+        <TextInput
+            placeholder="Dosage"
+            style={styles.input}
+            onChangeText={onChangeDosage}
+            value={dosage}
+            onBlur={Keyboard.dismiss}
+        />
+        <TextInput
+            placeholder="Gender"
+            style={styles.input}
+            onChangeText={onChangeGender}
+            value={gender}
+            onBlur={Keyboard.dismiss}
+        />
+        <TextInput
+            placeholder="Parent number"
+            style={styles.input}
+            onChangeText={onChangeParent}
+            value={parent}
+            onBlur={Keyboard.dismiss}
+        />
+        <TextInput
+            placeholder="Doctor number"
+            style={styles.input}
+            onChangeText={onChangeDoctor}
+            value={doctor}
+            onBlur={Keyboard.dismiss}
+        />
+            <Pressable
+              style={styles.createButton}
+              onPress={() => setModalVisible(!modalVisible)}
+            >
+              <Text>Hide Modal</Text>
+            </Pressable>
+          </View>
+        </View>
+
+      </Modal>
     </SafeAreaView>
   );
   }
 
   const styles = StyleSheet.create({
+    insideWrapper: {
+      flexDirection:"row",
+      marginTop: 70
+    },
+    centeredView: {
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center",
+      marginTop: 22
+    },
+    modalView: {
+      margin: 20,
+      backgroundColor: "white",
+      borderRadius: 20,
+      padding: 35,
+      alignItems: "center",
+      shadowColor: "#000",
+      shadowOffset: {
+        width: 0,
+        height: 2
+      },
+      shadowOpacity: 0.25,
+      shadowRadius: 4,
+      elevation: 5
+    },
     safeAreaView: {
       flexDirection: "column",
       flex: 1,
@@ -86,12 +186,14 @@ export default function Councelor() {
       backgroundColor: '#fff'
     },
     dropdown: {
+      marginTop: -50,
       marginBottom: 50,
-      borderColor: '#0284ff'
+      borderColor: '#0284ff',
+      justifyContent: 'flex-start',
+      flex:1
     },
     label: {
       marginTop: 50,
-      marginBottom: 30,
       fontSize: 18,
     },
     labelTwo: {
@@ -104,7 +206,8 @@ export default function Councelor() {
       padding: 10,
       width: 120,
       borderRadius: 7,
-      alignItems: 'center'
+      alignItems: 'center',
+      color: '#fff'
     },
     createButtonText: {
       fontSize: 20,
@@ -126,6 +229,13 @@ export default function Councelor() {
       padding: 10,
       width: 300,
       borderColor: "#0284ff"
+    },
+    addCamperButton: {
+      fontSize: 40,
+      color: "blue",
+      justifyContent: 'flex-end',
+      flex: 1,
+      backgroundColor: 'red',
     }
   })
   
