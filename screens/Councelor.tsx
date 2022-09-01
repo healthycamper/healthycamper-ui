@@ -1,52 +1,99 @@
-import React, { useState } from 'react';
-import { Alert, Modal, SafeAreaView, Text, View, StyleSheet, Pressable, TextInput, Keyboard, Image } from 'react-native';
+import React, { useState, useEffect, useContext } from 'react';
+import { ScrollView, Alert, Modal, SafeAreaView, Text, View, StyleSheet, Pressable, TextInput, Keyboard, Image } from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
 import plus from '../public/plus.png'
+import UpdateForm from './UpdateForm';
+import authContext from '../components/authContext';
 
-export interface GlobalType {
-  nickname: string;
+export interface CamperType {
+  name: string;
   age: string;
+  gender: string;
   diagnosis: string;
   medication: string;
   dosage: string;
-  gender: string;
-  parent: string;
-  doctor: string;
+  dosageUnits: string;
+  doctor: DoctorType;
+  parent: ParentType
+}
+export interface ParentType {
+  name: string;
+  relation: string;
+  phoneNumber: string;
+  email: string
+}
+export interface DoctorType {
+  name: string;
+  relation: string;
+  phoneNumber: string;
+  email: string
 }
 
 export default function Councelor() {
+  const [selectedCamper, setSelectedCamper] = useState<any>();
+
+  const [campers, setCampers] = useState<CamperType[]>([]);
+
   const [modalVisible, setModalVisible] = useState(false);
+
+  const { authenticated, setAuthenticated } = useContext(authContext);
   
-  const [nickName, onChangeNickName] = useState<GlobalType['nickname']>("");
-  const [age, onChangeAge] = useState<GlobalType['age']>("");
-  const [diagnosis, onChangeDiagnosis] = useState<GlobalType['diagnosis']>("");
-  const [medication, onChangeMedication] = useState<GlobalType['medication']>("");
-  const [dosage, onChangeDosage] = useState<GlobalType['dosage']>("");
-  const [gender, onChangeGender] = useState<GlobalType['gender']>("");
-  const [parent, onChangeParent] = useState<GlobalType['parent']>("");
-  const [doctor, onChangeDoctor] = useState<GlobalType['doctor']>("");
+  const [name, onChangeName] = useState<CamperType['name']>("");
+  const [age, onChangeAge] = useState<CamperType['age']>("");
+  const [diagnosis, onChangeDiagnosis] = useState<CamperType['diagnosis']>("");
+  const [gender, onChangeGender] = useState<CamperType['gender']>("");
+
+  const [medication, onChangeMedication] = useState<CamperType['medication']>("");
+  const [dosage, onChangeDosage] = useState<CamperType['dosage']>("");
+  const [dosageUnits, onChangeDosageUnits] = useState<CamperType['dosageUnits']>("");
+  
+  const [parentName, onChangeParentName] = useState<ParentType['name']>("");
+  const [parentNumber, onChangeParentNumber] = useState<ParentType['phoneNumber']>("");
+  const [parentRelationship, onChangeParentRelationship] = useState<ParentType['relation']>("");
+  const [parentEmail, onChangeParentEmail] = useState<ParentType['email']>("");
+
+  const [doctorCamperNickname, onChangeDoctorCamperNickname] = useState<DoctorType['name']>("");
+  const [doctorNumber, onChangeDoctorNumber] = useState<DoctorType['phoneNumber']>("");
+  const [doctorRelationship, onChangeDoctorRelationship] = useState<DoctorType['relation']>("");
+  const [doctorEmail, onChangeDoctorEmail] = useState<DoctorType['email']>("");
 
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState(null);
-  const [items, setItems] = useState([
-    {label: 'Apple', value: 'apple'},
-    {label: 'Banana', value: 'banana'}
-  ]);
 
+  const logout = () => {
+    setAuthenticated(false)
+  }
+
+  useEffect(() => {
+    fetch("http://localhost:3000/campers") 
+    .then((response) => { 
+        return response.json();
+    })
+      .then((data) => {
+        setCampers(data)
+    }) 
+  }, []);
+  useEffect(() => {
+     if(selectedCamper){
+      console.log('selected', selectedCamper)
+     }
+}, [selectedCamper]);
   return (
     <SafeAreaView style={styles.safeAreaView}>
+    <View>
+      <Text style={styles.labelTwo} >Select a camper or create a new one</Text>
+    </View>
     <View style={styles.insideWrapper}>
-    {/* <View>
-        <Text style={styles.label}>Choose a camper</Text>
-    </View> */}
     <DropDownPicker
       style={styles.dropdown}
       open={open}
       value={value}
-      items={items}
+      items={campers.map((camper) => ({label: camper.name as string, value: camper.name as string}))}
+      onSelectItem={(item) => {
+        setSelectedCamper(item);
+      }}
       setOpen={setOpen}
       setValue={setValue}
-      setItems={setItems}
       placeholder = 'Select a camper'
       textStyle={{fontSize: 17, color: '#a1a1a1' }}
       containerStyle={{
@@ -59,18 +106,29 @@ export default function Councelor() {
       selectedItemLabelStyle={{
         fontWeight: "bold",
       }}
+      dropDownContainerStyle={{
+        backgroundColor: 'white',
+        borderColor: '#0284ff',
+        maxHeight: 150
+      }}
     />
       <Pressable style={{borderRadius: 7, marginLeft: 4, backgroundColor: '#2196f3'}}
       onPress={() => setModalVisible(true)}>
         <Image style={{height: 50}} source={plus}/>
       </Pressable> 
   </View>
-    <View>
-      <Text style={styles.labelTwo} >Select a camper or create a new one</Text>
-    </View>
-    <Pressable style={styles.button}>
-      <Text style={styles.buttonText}>Logout</Text>
-    </Pressable>
+    {selectedCamper ? (
+      <>
+            <UpdateForm />
+      <Pressable onPress={()=>logout()}>
+        <Text style={styles.buttonText}>Logout</Text>
+      </Pressable>
+      </>
+        ) :    
+      <Pressable onPress={()=>logout()} style={styles.button}>
+        <Text style={styles.buttonText}>Logout</Text>
+      </Pressable>
+    }
     <Modal
         animationType="slide"
         transparent={true}
@@ -79,14 +137,15 @@ export default function Councelor() {
           Alert.alert("Modal has been closed.");
           setModalVisible(!modalVisible);
         }}
-      >
+        >
+        <ScrollView>
         <View style={styles.centeredView}>
           <View style={styles.modalView}>
           <TextInput
         placeholder="Nickname"
         style={styles.input}
-        onChangeText={onChangeNickName}
-        value={nickName}
+        onChangeText={onChangeName}
+        value={name}
         onBlur={Keyboard.dismiss}
         />
         <TextInput
@@ -97,27 +156,6 @@ export default function Councelor() {
             onBlur={Keyboard.dismiss}
         />
         <TextInput
-            placeholder="Diagnosis"
-            style={styles.input}
-            onChangeText={onChangeDiagnosis}
-            value={diagnosis}
-            onBlur={Keyboard.dismiss}
-        />
-        <TextInput
-            placeholder="Medication"
-            style={styles.input}
-            onChangeText={onChangeMedication}
-            value={medication}
-            onBlur={Keyboard.dismiss}
-        />
-        <TextInput
-            placeholder="Dosage"
-            style={styles.input}
-            onChangeText={onChangeDosage}
-            value={dosage}
-            onBlur={Keyboard.dismiss}
-        />
-        <TextInput
             placeholder="Gender"
             style={styles.input}
             onChangeText={onChangeGender}
@@ -125,28 +163,116 @@ export default function Councelor() {
             onBlur={Keyboard.dismiss}
         />
         <TextInput
+            placeholder="Diagnosis"
+            style={styles.input}
+            onChangeText={onChangeDiagnosis}
+            value={diagnosis}
+            onBlur={Keyboard.dismiss}
+        />
+        
+        <View>
+          <Text style={styles.labelBetween} >Medication info</Text>
+        </View>
+        <TextInput
+            placeholder="Medication"
+            style={styles.inputMedication}
+            onChangeText={onChangeMedication}
+            value={medication}
+            onBlur={Keyboard.dismiss}
+        />
+        <TextInput
+            placeholder="Dosage"
+            style={styles.inputMedication}
+            onChangeText={onChangeDosage}
+            value={dosage}
+            onBlur={Keyboard.dismiss}
+        />
+        <TextInput
+            placeholder="Dosage units"
+            style={styles.inputMedication}
+            onChangeText={onChangeDosageUnits}
+            value={dosageUnits}
+            onBlur={Keyboard.dismiss}
+        />
+        <View>
+          <Text style={styles.labelBetween} >Parent info</Text>
+        </View>
+        <TextInput
+            placeholder="Parent name"
+            style={styles.input}
+            onChangeText={onChangeParentName}
+            value={parentName}
+            onBlur={Keyboard.dismiss}
+        />
+        <TextInput
+            placeholder="Relation to camper"
+            style={styles.input}
+            onChangeText={onChangeParentRelationship}
+            value={parentRelationship}
+            onBlur={Keyboard.dismiss}
+        />
+        <TextInput
             placeholder="Parent number"
             style={styles.input}
-            onChangeText={onChangeParent}
-            value={parent}
+            onChangeText={onChangeParentNumber}
+            value={parentNumber}
+            onBlur={Keyboard.dismiss}
+        />
+         <TextInput
+            placeholder="Parent email"
+            style={styles.input}
+            onChangeText={onChangeParentEmail}
+            value={parentEmail}
+            onBlur={Keyboard.dismiss}
+        />
+        <View>
+          <Text style={styles.labelBetween} >Doctor info</Text>
+        </View>
+        <TextInput
+            placeholder="Camper nickname"
+            style={styles.input}
+            onChangeText={onChangeDoctorCamperNickname}
+            value={doctorCamperNickname}
+            onBlur={Keyboard.dismiss}
+        />
+        <TextInput
+            placeholder="Relation to patient"
+            style={styles.input}
+            onChangeText={onChangeDoctorRelationship}
+            value={doctorRelationship}
             onBlur={Keyboard.dismiss}
         />
         <TextInput
             placeholder="Doctor number"
             style={styles.input}
-            onChangeText={onChangeDoctor}
-            value={doctor}
+            onChangeText={onChangeDoctorNumber}
+            value={doctorNumber}
             onBlur={Keyboard.dismiss}
         />
+        <TextInput
+            placeholder="Doctor email"
+            style={styles.input}
+            onChangeText={onChangeDoctorEmail}
+            value={doctorEmail}
+            onBlur={Keyboard.dismiss}
+        />
+            <View style={styles.buttonWrapper}>
             <Pressable
               style={styles.createButton}
               onPress={() => setModalVisible(!modalVisible)}
             >
-              <Text style={styles.createButtonText}>Hide Modal</Text>
+              <Text style={styles.createButtonText}>Cancel</Text>
             </Pressable>
+            <Pressable
+              style={styles.createButton}
+              onPress={() => setModalVisible(!modalVisible)}
+            >
+              <Text style={styles.createButtonText}>Submit</Text>
+            </Pressable>
+            </View>
           </View>
         </View>
-
+        </ScrollView>
       </Modal>
     </SafeAreaView>
   );
@@ -155,7 +281,14 @@ export default function Councelor() {
   const styles = StyleSheet.create({
     insideWrapper: {
       flexDirection: 'row',
-      marginTop: 50
+      marginTop: 20
+    },
+    buttonWrapper: {
+      flexDirection: "row",
+      flex: 1, 
+      backgroundColor: "#fff",
+      justifyContent: 'space-around',
+      alignItems: 'center'
     },
     centeredView: {
       flex: 1,
@@ -192,12 +325,19 @@ export default function Councelor() {
       fontSize: 18,
     },
     labelTwo: {
-      marginTop: 20,
+      marginTop: 40,
+      fontSize: 14,
+      color: '#a1a1a1',
+    },
+    labelBetween: {
+      marginTop: 10,
       fontSize: 14,
       color: '#a1a1a1',
     },
     createButton: {
       marginTop: 50,
+      marginLeft: 20,
+      marginRight: 20,
       backgroundColor: '#0284ff',
       paddingLeft: 20,
       paddingRight: 20,
@@ -227,6 +367,16 @@ export default function Councelor() {
       padding: 10,
       width: 300,
       borderColor: "#0284ff"
+    },
+    inputMedication: {
+      height: 40,
+      marginTop: 12,
+      borderRadius: 8,
+      borderWidth: 1,
+      padding: 10,
+      width: 300,
+      borderColor: "#0284ff",
+      backgroundColor: '#e2f2fe'
     },
     addCamperButton: {
       fontSize: 40,
